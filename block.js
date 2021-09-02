@@ -159,7 +159,22 @@ function isVaildBlock(blocks){
     }
 
     let tempBlocks = [blocks[0]]
+    for( let i = 1; i < blocks.length; i++){
+        if (isVaildNewBlock(blocks[i],tempBlocks[i-1])){
+            tempBlocks.push(blocks[i])
+        } else{
+            return false
+        }
+    }
+    return true
 }
 
 
 //console.log(Blocks)
+
+module.exports ={
+    getBlock,
+    getLastBlocks,
+    addBlock,
+    getVersion,
+}
