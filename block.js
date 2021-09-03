@@ -69,7 +69,7 @@ function addBlock(data){
     const newBlock = nextBlock(data)
     if(isVaildNewBlock(newBlock,getLastBlocks())){
         Blocks.push(newBlock);
-        return true;
+        return newBlock;
     }
     return false;
 }
@@ -106,7 +106,7 @@ function isVaildType(block){
     ) 
 }
 
-let Blocks = [createGenesisBlock()]
+let Blocks = [createGenesisBlock(),]
 
 function getBlocks(){
     return Blocks
@@ -173,7 +173,7 @@ function isVaildBlock(blocks){
 //console.log(Blocks)
 
 module.exports ={
-    getBlock,
+    getBlocks,
     getLastBlocks,
     addBlock,
     getVersion,
