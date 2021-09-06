@@ -1,6 +1,7 @@
 const fs = require('fs')
 const merkle = require('merkle')
 const CrytoJs = require('crypto-js')
+const random = require('random')
 
 /* 사용법 */
 // const tree = merkle("sha256").sync([]) // return이 tree 구조로 만들어줌
@@ -64,14 +65,24 @@ function createHash(block){
     return Hash
 }
 
-function addBlock(data){
+function addBlock(newBlock){
 
-    const newBlock = nextBlock(data)
     if(isVaildNewBlock(newBlock,getLastBlocks())){
         Blocks.push(newBlock);
-        return newBlock;
+        return true;
     }
     return false;
+}
+
+function mineBlock(blockData){
+    const newBlock = nextBlock(blockData)
+    if(addBlock(newBlock)){
+        const nw = require('./network')
+        nw.broadcast(nw.responseLastMsg())
+        return newBlock
+    } else {
+        return null
+    }
 }
 
 function isVaildNewBlock(currentBlock,previousBlock){
@@ -104,6 +115,18 @@ function isVaildType(block){
     typeof(block.header.merkleRoot) === "string" &&
     typeof(block.body) === "object"
     ) 
+}
+
+function replaceBlock(newBlocks){
+    if(isVaildBlock(newBlocks) && newBlocks.length > Blocks.length && random.boolean()){
+        console.log(`Blocks 배열을 newBlocks으로 교체합니다.`)
+        const nw = require('./network')
+        Blocks = newBlocks
+        nw.broadcast(nw.responseLastMsg())
+
+    } else {
+        console.log(`메시지로부터 받은 블록배열이 맞지 않습니다.`)
+    }
 }
 
 let Blocks = [createGenesisBlock(),]
@@ -147,10 +170,6 @@ function getCurrentTime(){
     return Math.ceil( new Date().getTime()/1000)
 }
 
-addBlock(["hello1"])
-addBlock(["hello2"])
-addBlock(["hello3"])
-
 
 function isVaildBlock(blocks){
     if(JSON.stringify(blocks[0]) !== JSON.stringify(createGenesisBlock())){
@@ -177,4 +196,7 @@ module.exports ={
     getLastBlocks,
     addBlock,
     getVersion,
+    mineBlock,
+    createHash,
+    replaceBlock,
 }
